@@ -92,6 +92,16 @@ type partialElement struct {
 	prov   PartialProvider
 }
 
+var (
+	otag = "{{"
+	ctag = "}}"
+)
+
+func SetDelimiters(left, right string) {
+	otag = left
+	ctag = right
+}
+
 // Template represents a compilde mustache template
 type Template struct {
 	data     string
@@ -728,7 +738,7 @@ func ParseStringPartials(data string, partials PartialProvider) (*Template, erro
 }
 
 func ParseStringPartialsRaw(data string, partials PartialProvider, forceRaw bool) (*Template, error) {
-	tmpl := Template{data, "{{", "}}", 0, 1, []interface{}{}, forceRaw, partials}
+	tmpl := Template{data, otag, ctag, 0, 1, []interface{}{}, forceRaw, partials}
 	err := tmpl.parse()
 
 	if err != nil {
@@ -764,7 +774,7 @@ func ParseFilePartialsRaw(filename string, forceRaw bool, partials PartialProvid
 		return nil, err
 	}
 
-	tmpl := Template{string(data), "{{", "}}", 0, 1, []interface{}{}, forceRaw, partials}
+	tmpl := Template{string(data), otag, ctag, 0, 1, []interface{}{}, forceRaw, partials}
 	err = tmpl.parse()
 
 	if err != nil {
