@@ -3,7 +3,6 @@ package mustache
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
@@ -636,12 +635,7 @@ func renderElement(element interface{}, contextChain []interface{}, buf io.Write
 		}
 
 		if val.IsValid() {
-			if elem.raw {
-				fmt.Fprint(buf, val.Interface())
-			} else {
-				s := fmt.Sprint(val.Interface())
-				template.HTMLEscape(buf, []byte(s))
-			}
+			fmt.Fprint(buf, val.Interface())
 		}
 	case *sectionElement:
 		if err := renderSection(elem, contextChain, buf); err != nil {
