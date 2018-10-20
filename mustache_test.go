@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 	"testing"
 )
 
@@ -186,18 +185,6 @@ func TestBasic(t *testing.T) {
 			t.Errorf("%q expected %q got %q", test.tmpl, test.expected, output)
 		}
 	}
-
-	// Now set AllowMissingVariables=false and test again
-	AllowMissingVariables = false
-	defer func() { AllowMissingVariables = true }()
-	for _, test := range tests {
-		output, err := Render(test.tmpl, test.context)
-		if err != nil {
-			t.Errorf("%s expected %s but got error %s", test.tmpl, test.expected, err.Error())
-		} else if output != test.expected {
-			t.Errorf("%q expected %q got %q", test.tmpl, test.expected, output)
-		}
-	}
 }
 
 var missing = []Test{
@@ -211,24 +198,11 @@ var missing = []Test{
 }
 
 func TestMissing(t *testing.T) {
-	// Default behavior, AllowMissingVariables=true
-	for _, test := range missing {
-		output, err := Render(test.tmpl, test.context)
-		if err != nil {
-			t.Error(err)
-		} else if output != test.expected {
-			t.Errorf("%q expected %q got %q", test.tmpl, test.expected, output)
-		}
-	}
-
-	// Now set AllowMissingVariables=false and confirm we get errors.
-	AllowMissingVariables = false
-	defer func() { AllowMissingVariables = true }()
 	for _, test := range missing {
 		output, err := Render(test.tmpl, test.context)
 		if err == nil {
 			t.Errorf("%q expected missing variable error but got %q", test.tmpl, output)
-		} else if strings.Index(err.Error(), "Missing variable") == -1 {
+		} else if !ErrorMatchesType(err, ErrorTypeMissingParams) {
 			t.Errorf("%q expected missing variable error but got %q", test.tmpl, err.Error())
 		}
 	}

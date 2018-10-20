@@ -5,10 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/banDedo/mustache"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-
-	"github.com/cbroglie/mustache"
 )
 
 var rootCmd = &cobra.Command{

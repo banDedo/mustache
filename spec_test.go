@@ -9,133 +9,477 @@ import (
 	"testing"
 )
 
-var enabledTests = map[string]map[string]bool{
-	"comments.json": map[string]bool{
-		"Inline":                           true,
-		"Multiline":                        true,
-		"Standalone":                       true,
-		"Indented Standalone":              true,
-		"Standalone Line Endings":          true,
-		"Standalone Without Previous Line": true,
-		"Standalone Without Newline":       true,
-		"Multiline Standalone":             true,
-		"Indented Multiline Standalone":    true,
-		"Indented Inline":                  true,
-		"Surrounding Whitespace":           true,
+type container struct {
+	enabled       bool
+	acceptMissing bool
+}
+
+var enabledTests = map[string]map[string]container{
+	"comments.json": map[string]container{
+		"Inline": {
+			true,
+			false,
+		},
+		"Multiline": {
+			true,
+			false,
+		},
+		"Standalone": {
+			true,
+			false,
+		},
+		"Indented Standalone": {
+			true,
+			false,
+		},
+		"Standalone Line Endings": {
+			true,
+			false,
+		},
+		"Standalone Without Previous Line": {
+			true,
+			false,
+		},
+		"Standalone Without Newline": {
+			true,
+			false,
+		},
+		"Multiline Standalone": {
+			true,
+			false,
+		},
+		"Indented Multiline Standalone": {
+			true,
+			false,
+		},
+		"Indented Inline": {
+			true,
+			false,
+		},
+		"Surrounding Whitespace": {
+			true,
+			false,
+		},
 	},
-	"delimiters.json": map[string]bool{
-		"Pair Behavior":                    true,
-		"Special Characters":               true,
-		"Sections":                         true,
-		"Inverted Sections":                true,
-		"Partial Inheritence":              true,
-		"Post-Partial Behavior":            true,
-		"Outlying Whitespace (Inline)":     true,
-		"Standalone Tag":                   true,
-		"Indented Standalone Tag":          true,
-		"Pair with Padding":                true,
-		"Surrounding Whitespace":           true,
-		"Standalone Line Endings":          true,
-		"Standalone Without Previous Line": true,
-		"Standalone Without Newline":       true,
+	"delimiters.json": map[string]container{
+		"Pair Behavior": {
+			true,
+			false,
+		},
+		"Special Characters": {
+			true,
+			false,
+		},
+		"Sections": {
+			true,
+			false,
+		},
+		"Inverted Sections": {
+			true,
+			false,
+		},
+		"Partial Inheritence": {
+			true,
+			false,
+		},
+		"Post-Partial Behavior": {
+			true,
+			false,
+		},
+		"Outlying Whitespace (Inline)": {
+			true,
+			false,
+		},
+		"Standalone Tag": {
+			true,
+			false,
+		},
+		"Indented Standalone Tag": {
+			true,
+			false,
+		},
+		"Pair with Padding": {
+			true,
+			false,
+		},
+		"Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Standalone Line Endings": {
+			true,
+			false,
+		},
+		"Standalone Without Previous Line": {
+			true,
+			false,
+		},
+		"Standalone Without Newline": {
+			true,
+			false,
+		},
 	},
-	"interpolation.json": map[string]bool{
-		"No Interpolation":    true,
-		"Basic Interpolation": true,
+	"interpolation.json": map[string]container{
+		"No Interpolation": {
+			true,
+			false,
+		},
+		"Basic Interpolation": {
+			true,
+			false,
+		},
 		// disabled b/c Go uses "&#34;" in place of "&quot;"
 		// both are valid escapings, and we validate the behavior in mustache_test.go
-		"HTML Escaping":                                false,
-		"Triple Mustache":                              true,
-		"Ampersand":                                    true,
-		"Basic Integer Interpolation":                  true,
-		"Triple Mustache Integer Interpolation":        true,
-		"Ampersand Integer Interpolation":              true,
-		"Basic Decimal Interpolation":                  true,
-		"Triple Mustache Decimal Interpolation":        true,
-		"Ampersand Decimal Interpolation":              true,
-		"Basic Context Miss Interpolation":             true,
-		"Triple Mustache Context Miss Interpolation":   true,
-		"Ampersand Context Miss Interpolation":         true,
-		"Dotted Names - Basic Interpolation":           true,
-		"Dotted Names - Triple Mustache Interpolation": true,
-		"Dotted Names - Ampersand Interpolation":       true,
-		"Dotted Names - Arbitrary Depth":               true,
-		"Dotted Names - Broken Chains":                 true,
-		"Dotted Names - Broken Chain Resolution":       true,
-		"Dotted Names - Initial Resolution":            true,
-		"Interpolation - Surrounding Whitespace":       true,
-		"Triple Mustache - Surrounding Whitespace":     true,
-		"Ampersand - Surrounding Whitespace":           true,
-		"Interpolation - Standalone":                   true,
-		"Triple Mustache - Standalone":                 true,
-		"Ampersand - Standalone":                       true,
-		"Interpolation With Padding":                   true,
-		"Triple Mustache With Padding":                 true,
-		"Ampersand With Padding":                       true,
+		"HTML Escaping": {
+			false,
+			true,
+		},
+		"Triple Mustache": {
+			true,
+			false,
+		},
+		"Ampersand": {
+			true,
+			false,
+		},
+		"Basic Integer Interpolation": {
+			true,
+			false,
+		},
+		"Triple Mustache Integer Interpolation": {
+			true,
+			false,
+		},
+		"Ampersand Integer Interpolation": {
+			true,
+			false,
+		},
+		"Basic Decimal Interpolation": {
+			true,
+			false,
+		},
+		"Triple Mustache Decimal Interpolation": {
+			true,
+			false,
+		},
+		"Ampersand Decimal Interpolation": {
+			true,
+			false,
+		},
+		"Basic Context Miss Interpolation": {
+			true,
+			true,
+		},
+		"Triple Mustache Context Miss Interpolation": {
+			true,
+			true,
+		},
+		"Ampersand Context Miss Interpolation": {
+			true,
+			true,
+		},
+		"Dotted Names - Basic Interpolation": {
+			true,
+			false,
+		},
+		"Dotted Names - Triple Mustache Interpolation": {
+			true,
+			false,
+		},
+		"Dotted Names - Ampersand Interpolation": {
+			true,
+			false,
+		},
+		"Dotted Names - Arbitrary Depth": {
+			true,
+			false,
+		},
+		"Dotted Names - Broken Chains": {
+			true,
+			true,
+		},
+		"Dotted Names - Broken Chain Resolution": {
+			true,
+			true,
+		},
+		"Dotted Names - Initial Resolution": {
+			true,
+			false,
+		},
+		"Interpolation - Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Triple Mustache - Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Ampersand - Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Interpolation - Standalone": {
+			true,
+			false,
+		},
+		"Triple Mustache - Standalone": {
+			true,
+			false,
+		},
+		"Ampersand - Standalone": {
+			true,
+			false,
+		},
+		"Interpolation With Padding": {
+			true,
+			false,
+		},
+		"Triple Mustache With Padding": {
+			true,
+			false,
+		},
+		"Ampersand With Padding": {
+			true,
+			false,
+		},
 	},
-	"inverted.json": map[string]bool{
-		"Falsey":                           true,
-		"Truthy":                           true,
-		"Context":                          true,
-		"List":                             true,
-		"Empty List":                       true,
-		"Doubled":                          true,
-		"Nested (Falsey)":                  true,
-		"Nested (Truthy)":                  true,
-		"Context Misses":                   true,
-		"Dotted Names - Truthy":            true,
-		"Dotted Names - Falsey":            true,
-		"Internal Whitespace":              true,
-		"Indented Inline Sections":         true,
-		"Standalone Lines":                 true,
-		"Standalone Indented Lines":        true,
-		"Padding":                          true,
-		"Dotted Names - Broken Chains":     true,
-		"Surrounding Whitespace":           true,
-		"Standalone Line Endings":          true,
-		"Standalone Without Previous Line": true,
-		"Standalone Without Newline":       true,
+	"inverted.json": map[string]container{
+		"Falsey": {
+			true,
+			false,
+		},
+		"Truthy": {
+			true,
+			false,
+		},
+		"Context": {
+			true,
+			false,
+		},
+		"List": {
+			true,
+			false,
+		},
+		"Empty List": {
+			true,
+			false,
+		},
+		"Doubled": {
+			true,
+			false,
+		},
+		"Nested (Falsey)": {
+			true,
+			false,
+		},
+		"Nested (Truthy)": {
+			true,
+			false,
+		},
+		"Context Misses": {
+			true,
+			true,
+		},
+		"Dotted Names - Truthy": {
+			true,
+			false,
+		},
+		"Dotted Names - Falsey": {
+			true,
+			false,
+		},
+		"Internal Whitespace": {
+			true,
+			false,
+		},
+		"Indented Inline Sections": {
+			true,
+			false,
+		},
+		"Standalone Lines": {
+			true,
+			false,
+		},
+		"Standalone Indented Lines": {
+			true,
+			false,
+		},
+		"Padding": {
+			true,
+			false,
+		},
+		"Dotted Names - Broken Chains": {
+			true,
+			true,
+		},
+		"Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Standalone Line Endings": {
+			true,
+			false,
+		},
+		"Standalone Without Previous Line": {
+			true,
+			false,
+		},
+		"Standalone Without Newline": {
+			true,
+			false,
+		},
 	},
-	"partials.json": map[string]bool{
-		"Basic Behavior":                   true,
-		"Failed Lookup":                    true,
-		"Context":                          true,
-		"Recursion":                        true,
-		"Surrounding Whitespace":           true,
-		"Inline Indentation":               true,
-		"Standalone Line Endings":          true,
-		"Standalone Without Previous Line": true,
-		"Standalone Without Newline":       true,
-		"Standalone Indentation":           true,
-		"Padding Whitespace":               true,
+	"partials.json": map[string]container{
+		"Basic Behavior": {
+			true,
+			false,
+		},
+		"Failed Lookup": {
+			true,
+			false,
+		},
+		"Context": {
+			true,
+			false,
+		},
+		"Recursion": {
+			true,
+			false,
+		},
+		"Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Inline Indentation": {
+			true,
+			false,
+		},
+		"Standalone Line Endings": {
+			true,
+			false,
+		},
+		"Standalone Without Previous Line": {
+			true,
+			false,
+		},
+		"Standalone Without Newline": {
+			true,
+			false,
+		},
+		"Standalone Indentation": {
+			true,
+			false,
+		},
+		"Padding Whitespace": {
+			true,
+			false,
+		},
 	},
-	"sections.json": map[string]bool{
-		"Truthy":                 true,
-		"Falsey":                 true,
-		"Context":                true,
-		"Deeply Nested Contexts": true,
-		"List":                             true,
-		"Empty List":                       true,
-		"Doubled":                          true,
-		"Nested (Truthy)":                  true,
-		"Nested (Falsey)":                  true,
-		"Context Misses":                   true,
-		"Implicit Iterator - String":       true,
-		"Implicit Iterator - Integer":      true,
-		"Implicit Iterator - Decimal":      true,
-		"Implicit Iterator - Array":        true,
-		"Dotted Names - Truthy":            true,
-		"Dotted Names - Falsey":            true,
-		"Dotted Names - Broken Chains":     true,
-		"Surrounding Whitespace":           true,
-		"Internal Whitespace":              true,
-		"Indented Inline Sections":         true,
-		"Standalone Lines":                 true,
-		"Indented Standalone Lines":        true,
-		"Standalone Line Endings":          true,
-		"Standalone Without Previous Line": true,
-		"Standalone Without Newline":       true,
-		"Padding":                          true,
+	"sections.json": map[string]container{
+		"Truthy": {
+			true,
+			false,
+		},
+		"Falsey": {
+			true,
+			false,
+		},
+		"Context": {
+			true,
+			false,
+		},
+		"Deeply Nested Contexts": {
+			true,
+			false,
+		},
+		"List": {
+			true,
+			false,
+		},
+		"Empty List": {
+			true,
+			false,
+		},
+		"Doubled": {
+			true,
+			false,
+		},
+		"Nested (Truthy)": {
+			true,
+			false,
+		},
+		"Nested (Falsey)": {
+			true,
+			false,
+		},
+		"Context Misses": {
+			true,
+			true,
+		},
+		"Implicit Iterator - String": {
+			true,
+			false,
+		},
+		"Implicit Iterator - Integer": {
+			true,
+			false,
+		},
+		"Implicit Iterator - Decimal": {
+			true,
+			false,
+		},
+		"Implicit Iterator - Array": {
+			true,
+			false,
+		},
+		"Dotted Names - Truthy": {
+			true,
+			false,
+		},
+		"Dotted Names - Falsey": {
+			true,
+			false,
+		},
+		"Dotted Names - Broken Chains": {
+			true,
+			true,
+		},
+		"Surrounding Whitespace": {
+			true,
+			false,
+		},
+		"Internal Whitespace": {
+			true,
+			false,
+		},
+		"Indented Inline Sections": {
+			true,
+			false,
+		},
+		"Standalone Lines": {
+			true,
+			false,
+		},
+		"Indented Standalone Lines": {
+			true,
+			false,
+		},
+		"Standalone Line Endings": {
+			true,
+			false,
+		},
+		"Standalone Without Previous Line": {
+			true,
+			false,
+		},
+		"Standalone Without Newline": {
+			true,
+			false,
+		},
+		"Padding": {
+			true,
+			false,
+		},
 	},
 	"~lambdas.json": nil, // not implemented
 }
@@ -194,11 +538,11 @@ func TestSpec(t *testing.T) {
 }
 
 func runTest(t *testing.T, file string, test *specTest) {
-	enabled, ok := enabledTests[file][test.Name]
+	c, ok := enabledTests[file][test.Name]
 	if !ok {
 		t.Errorf("[%s %s]: Unexpected test, add to enabledTests", file, test.Name)
 	}
-	if !enabled {
+	if !c.enabled {
 		t.Logf("[%s %s]: Skipped", file, test.Name)
 		return
 	}
@@ -210,11 +554,13 @@ func runTest(t *testing.T, file string, test *specTest) {
 	} else {
 		out, err = Render(test.Template, test.Data)
 	}
-	if err != nil {
+
+	skipMissing := c.acceptMissing && ErrorMatchesType(err, ErrorTypeMissingParams)
+	if err != nil && !skipMissing {
 		t.Errorf("[%s %s]: %s", file, test.Name, err.Error())
 		return
 	}
-	if out != test.Expected {
+	if out != test.Expected && !skipMissing {
 		t.Errorf("[%s %s]: Expected %q, got %q", file, test.Name, test.Expected, out)
 		return
 	}

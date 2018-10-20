@@ -11,3 +11,4 @@ _test
 _testmain.go
 *.swp
 coverage.txt
+vendor/
