@@ -2,6 +2,7 @@ package mustache
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -635,7 +636,18 @@ func renderElement(element interface{}, contextChain []interface{}, buf io.Write
 		}
 
 		if val.IsValid() {
-			fmt.Fprint(buf, val.Interface())
+			i := val.Interface()
+			switch reflect.TypeOf(i).Kind() {
+			case reflect.Map, reflect.Struct, reflect.Array, reflect.Slice:
+				bs, err := json.Marshal(i)
+				if err != nil {
+					return err
+				}
+				i = string(bs)
+			case reflect.Chan, reflect.Func, reflect.Ptr, reflect.UnsafePointer:
+				return fmt.Errorf("invalid value type '%T'", i)
+			}
+			fmt.Fprint(buf, i)
 		}
 	case *sectionElement:
 		if err := renderSection(elem, contextChain, buf); err != nil {
