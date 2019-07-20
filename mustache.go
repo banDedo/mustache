@@ -11,8 +11,13 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+)
 
-	"github.com/hashicorp/go-multierror"
+var (
+	// AllowMissingVariables defines the behavior for a variable "miss." If it
+	// is true (the default), an empty string is emitted. If it is false, an error
+	// is generated instead.
+	AllowMissingVariables = true
 )
 
 // A TagType represents the specific type of mustache tag that a Tag
@@ -473,16 +478,16 @@ func (tmpl *Template) parse() error {
 
 // Evaluate interfaces and pointers looking for a value that can look up the name, via a
 // struct field, method, or map key, and return the result of the lookup.
-func lookup(contextChain []interface{}, name string, seed error) (reflect.Value, error) {
+func lookup(contextChain []interface{}, name string, allowMissing bool) (reflect.Value, error) {
 	// dot notation
 	if name != "." && strings.Contains(name, ".") {
 		parts := strings.SplitN(name, ".", 2)
 
-		v, err := lookup(contextChain, parts[0], seed)
+		v, err := lookup(contextChain, parts[0], allowMissing)
 		if err != nil {
 			return v, err
 		}
-		return lookup([]interface{}{v}, parts[1], seed)
+		return lookup([]interface{}{v}, parts[1], allowMissing)
 	}
 
 	defer func() {
@@ -530,15 +535,10 @@ Outer:
 			}
 		}
 	}
-	err := fmt.Errorf("missing template parameter: %q", name)
-	if err != nil {
-		err = multierror.Append(seed, err)
+	if allowMissing {
+		return reflect.Value{}, nil
 	}
-	seed = WrapError(
-		err,
-		ErrorTypeMissingParams,
-	)
-	return reflect.Value{}, seed
+	return reflect.Value{}, fmt.Errorf("Missing variable %q", name)
 }
 
 func isEmpty(v reflect.Value) bool {
@@ -578,7 +578,7 @@ loop:
 }
 
 func renderSection(section *sectionElement, contextChain []interface{}, buf io.Writer) error {
-	value, err := lookup(contextChain, section.name, nil)
+	value, err := lookup(contextChain, section.name, true)
 	if err != nil {
 		return err
 	}
@@ -630,7 +630,7 @@ func renderElement(element interface{}, contextChain []interface{}, buf io.Write
 				fmt.Printf("Panic while looking up %q: %s\n", elem.name, r)
 			}
 		}()
-		val, err := lookup(contextChain, elem.name, nil)
+		val, err := lookup(contextChain, elem.name, AllowMissingVariables)
 		if err != nil {
 			return err
 		}
